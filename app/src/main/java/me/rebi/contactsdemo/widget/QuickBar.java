@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -37,6 +36,7 @@ public class QuickBar extends View {
     private Paint textPaint;
     private OnTouchListener onTouchListener;
     private Paint.FontMetrics fm;
+    private int barColor=Color.TRANSPARENT;
 
     public void setOnTouchListener(OnTouchListener onTouchListener) {
         this.onTouchListener = onTouchListener;
@@ -115,7 +115,7 @@ public class QuickBar extends View {
     private float length;
 
     private void drawBar(Canvas canvas) {
-        barPaint.setColor(Color.argb(255,179,179,179));
+        barPaint.setColor(barColor);
         RectF rectF=new RectF(mWidth-barWidth,0,mWidth,mHeight);
         canvas.drawRect(rectF, barPaint);
         barPaint.setColor(Color.argb(255,0,0,0));
@@ -129,15 +129,12 @@ public class QuickBar extends View {
 
     private void drawText(Canvas canvas) {
         if (can()) {
-
             float textCenterVerticalBaselineY = mHeight / 2 - fm.descent + (fm.bottom - fm.top) / 2;
-
-            barPaint.setColor(Color.argb(255,179,179,179));
+            barPaint.setColor(Color.argb(123,113,113,113));
             RectF rectF=new RectF(mWidth / 2-100,mHeight / 2-100,mWidth / 2+100,mHeight / 2+100);
             canvas.drawRect(rectF, barPaint);
             canvas.drawText(strList.get(position), mWidth / 2, textCenterVerticalBaselineY, textPaint);
         }
-
     }
 
     @Override
@@ -146,14 +143,9 @@ public class QuickBar extends View {
         Log.d(TAG, "onFinishInflate: ");
     }
 
-
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        Log.d(TAG, "onSizeChanged: w=" + w);
-        Log.d(TAG, "onSizeChanged: h=" + h);
-        Log.d(TAG, "onSizeChanged: oldw=" + oldw);
-        Log.d(TAG, "onSizeChanged: oldh=" + oldh);
         mWidth = w;
         mHeight = h;
     }
@@ -175,6 +167,7 @@ public class QuickBar extends View {
                 if (downX > (mWidth - barWidth) && downX < mWidth) {
                     position = getPos(downY);
                     Log.d(TAG, "onTouchEvent ACTION_DOWN: position=" + position);
+                    barColor=Color.argb(123,113,113,113);
                     invalidate();
                     if (can()) {
                         onTouchListener.touch(map.get(strList.get(position)));
@@ -198,6 +191,7 @@ public class QuickBar extends View {
 
             case MotionEvent.ACTION_UP:
                 position = -1;
+                barColor=Color.TRANSPARENT;
                 invalidate();
                 break;
         }

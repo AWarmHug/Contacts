@@ -4,13 +4,13 @@ package me.rebi.contactsdemo.bean;
  * Created by rebi-mac on 2016/11/24.
  */
 
-public class Contacts {
+public class Contact {
     private String _id;
     private String PinYin;
     private String name;
     private String phoneNum;
 
-    public Contacts(String _id, String pinYin, String name, String phoneNum) {
+    public Contact(String _id, String pinYin, String name, String phoneNum) {
         this._id = _id;
         this.PinYin = pinYin;
         this.name = name;
@@ -51,7 +51,7 @@ public class Contacts {
 
     @Override
     public String toString() {
-        return "Contacts{" +
+        return "Contact{" +
                 "_id='" + _id + '\'' +
                 ", PinYin='" + PinYin + '\'' +
                 ", name='" + name + '\'' +

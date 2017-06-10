@@ -6,27 +6,9 @@
     android:layout_height="match_parent"
     tools:context="me.rebi.contactsdemo.MainActivity">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rv"
+    <me.rebi.contactsdemo.widget.LView
+        android:id="@+id/lView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-    </android.support.v7.widget.RecyclerView>
-    <TextView
-        android:id="@+id/suspensionTv"
-        android:layout_width="match_parent"
-        android:layout_height="25dp"
-        android:textSize="16dp"
-        android:paddingLeft="10dp"
-        android:gravity="center_vertical"
-        android:textColor="@color/text_color"
-        android:background="@color/bisque"
-        />
-    <me.rebi.contactsdemo.widget.QuickBar
-        android:id="@+id/quickBar"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentRight="true"
-        />
+        android:layout_height="match_parent"></me.rebi.contactsdemo.widget.LView>
 
 </RelativeLayout>
