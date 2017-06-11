@@ -14,6 +14,11 @@
         android:id="@+id/pull"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+        <me.rebi.contactsdemo.widget.pulltorefresh.Header
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        </me.rebi.contactsdemo.widget.pulltorefresh.Header>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rv"

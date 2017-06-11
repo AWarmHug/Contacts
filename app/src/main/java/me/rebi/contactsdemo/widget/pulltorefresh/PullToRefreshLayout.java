@@ -23,8 +23,6 @@ public class PullToRefreshLayout extends ViewGroup {
 
     private static final String TAG = "PullToRefreshLayout";
 
-    private View mHeader;
-
     private View mTarget;
 
     private int state;
@@ -32,7 +30,7 @@ public class PullToRefreshLayout extends ViewGroup {
     /**
      * 模拟高度
      */
-    private int height ;
+    private int height=200 ;
 
 
     /**
@@ -50,6 +48,13 @@ public class PullToRefreshLayout extends ViewGroup {
 
 
     private OnRefreshing onRefreshing;
+
+    private void setState(int state){
+        this.state=state;
+        if (onPullStateChange!=null) {
+            onPullStateChange.pullState(state);
+        }
+    }
 
     public void setOnRefreshing(OnRefreshing onRefreshing) {
         this.onRefreshing = onRefreshing;
@@ -74,8 +79,7 @@ public class PullToRefreshLayout extends ViewGroup {
         mScroller = new Scroller(getContext());
         mTouchSlop = ViewConfiguration.get(getContext()).getScaledPagingTouchSlop();
         maxVelocity = ViewConfiguration.get(context).getScaledMaximumFlingVelocity();
-        mHeader=new Header(context, attrs, defStyle);
-        addView(mHeader);
+        Log.d(TAG, "111PullToRefreshLayout: ");
 
     }
 
@@ -84,9 +88,10 @@ public class PullToRefreshLayout extends ViewGroup {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         int measureWidth = doMeasureWidth(widthMeasureSpec);
         int measureHeight = doMeasureHeight(heightMeasureSpec);
+
         setMeasuredDimension(measureWidth, measureHeight);
         measureChildren(widthMeasureSpec, heightMeasureSpec);
-
+        Log.d(TAG, "111onMeasure: ");
 
 
     }
@@ -133,13 +138,12 @@ public class PullToRefreshLayout extends ViewGroup {
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         int left = getPaddingLeft();
         int top = getPaddingTop();
-
+        Log.d(TAG, "111onLayout: ");
         if (changed) {
 
             top-=getChildAt(0).getMeasuredHeight();
             height=getChildAt(0).getMeasuredHeight();
 
-            //需要手动变0 防止重复测量
             Log.d(TAG, "onLayout: "+getChildCount());
 
             for (int i = 0; i < getChildCount(); i++) {
@@ -154,10 +158,12 @@ public class PullToRefreshLayout extends ViewGroup {
         }
     }
 
+
+
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-
+        Log.d(TAG, "111onFinishInflate: ");
         for (int i = 0; i < getChildCount(); i++) {
             if (getChildAt(i) instanceof RecyclerView || getChildAt(i) instanceof AbsListView || getChildAt(i) instanceof ScrollView) {
                 mTarget = getChildAt(i);
@@ -166,6 +172,8 @@ public class PullToRefreshLayout extends ViewGroup {
         }
 
     }
+
+
 
     private float downY;
 
@@ -201,30 +209,52 @@ public class PullToRefreshLayout extends ViewGroup {
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+
                 break;
             case MotionEvent.ACTION_MOVE:
                 //处理位置
                 YY = event.getY() - downY;
                 scrollTo(0, (int) -YY / 2);
-                onPullStateChange.pullState(State.PUSHING);
                 Log.d(TAG, "onInterceptTouchEvent: " + YY);
+                //当滑动距离大于，最小距离（mHeader的高度）的时候，刷新，小于的时候回到顶端
+                if (-getScrollY() >= height) {
+
+                    Log.d(TAG, "onTouchEvent: 1");
+                    //可以加载了
+                    setState(State.PUSH_OK);
+
+
+                } else {
+                    Log.d(TAG, "onTouchEvent: 2");
+                    //不可以加载
+                    setState(State.PUSH_NO_OK);
+
+                }
+
+
                 break;
             case MotionEvent.ACTION_UP:
 
-                if (onRefreshing != null) {
-                    onRefreshing.refresh();
-                }
+
                 Log.d(TAG, "onTouchEvent: " + getScrollY());
 
                 //当滑动距离大于，最小距离（mHeader的高度）的时候，刷新，小于的时候回到顶端
                 if (-getScrollY() >= height) {
+
                     Log.d(TAG, "onTouchEvent: 1");
                     //可以加载了
                     startScroll(getScrollY(), Math.abs(getScrollY())-height);
+                    setState(State.REFRESHING);
+                    if (onRefreshing != null) {
+                        onRefreshing.refresh();
+                    }
+
+
                 } else {
                     Log.d(TAG, "onTouchEvent: 2");
                     //不可以加载
                     startScroll(getScrollY(), -getScrollY());
+                    setState(State.END);
                 }
 
                 break;
@@ -273,17 +303,30 @@ public class PullToRefreshLayout extends ViewGroup {
 
     }
 
+
+    public void refreshStart(){
+        //可以加载了
+        startScroll(getScrollY(), Math.abs(getScrollY())-height);
+        setState(State.REFRESHING);
+        if (onRefreshing != null) {
+            onRefreshing.refresh();
+        }
+    }
+
     public void refreshEnd() {
         startScroll(getScrollY(), -getScrollY());
+        setState(State.END);
+
     }
+
 
     /**
      * 刷新中，在这个借口中进行刷新的操作
      */
     interface OnRefreshing {
         void refresh();
-    }
 
+    }
 
     /**
      * 下拉状态改变，{@link State}
@@ -292,7 +335,5 @@ public class PullToRefreshLayout extends ViewGroup {
         void pullState(int state);
 
         void pulling(float y);
-
-
     }
 }
